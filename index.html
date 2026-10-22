@@ -127,7 +127,7 @@ function makeLevel(i){const L=LV[i],R=rng(1009+i*7919);
  const pats=[];const PR=rng(77+i*31);for(let k=0;k<L.pat;k++){let nx,ny,tries2=0;do{nx=Math.floor(PR()*7);ny=Math.floor(PR()*7);tries2++}while(tries2<50&&Math.abs(nx*7+1-st[0])+Math.abs(ny*7+1-st[1])<16);
   pats.push({nx,ny,tx:nx,ty:ny,x:(nx*7+1)*TS,y:(ny*7+1)*TS,a:0,spd:95+k*8,cool:0,light:0,R:PR})}
  const sx=(st[0]+.5)*TS,sy=(st[1]+.5)*TS,ang=Math.round(Math.atan2(f.y-sy,f.x-sx)/(Math.PI/2))*(Math.PI/2);
- const g={L,li:i,t:0,si:0,cargo:[],heat:0,spots:0,lastSpot:-99,cams,blk,par,pats,car:{x:sx,y:sy,a:ang,vx:0,vy:0,av:0,rev:0,stuck:0,hit:0},
+ const g={L,li:i,t:0,si:0,cargo:[],heat:0,spots:0,lastSpot:-99,cams,blk,par,pats,car:{x:sx,y:sy,a:ang,vx:0,vy:0,av:0,ss:0,rev:0,stuck:0,hit:0},
   camx:sx,camy:sy,shake:0,flash:0,skids:[],parts:[],toasts:[],route:null,routeT:-1,routeTile:-1,over:0,overT:0,win:false,bot:null,read:0,startPos:[st[0],st[1]],len};
  for(const p of pats)nextPatrol(p);
  return g}
@@ -194,6 +194,8 @@ function controls(){let thr=0,steer=0,mode='none',tx=0,ty=0,mag=0;
  if(c.rev>0){thr=-0.8;steer=-steer}
  return{thr,steer}}
 function ctlZone(x,y){const s=S(),bw=Math.min(96,s.w*.22),bh=bw,by=s.b-bh-14;if(y<by-30)return null;if(x<s.l+bw+14)return'L';if(x<s.l+2*bw+24)return'R';if(x>s.r-bw-14)return'G';if(x>s.r-2*bw-24)return'B';return null}
+// Steering tuning (v2: ~20% gentler than v1's rate 3.1 / response 14, plus light input smoothing)
+const STEER_RATE=2.6,STEER_RESP=12,STEER_SMOOTH=30;
 function update(dt){if(!G)return;G.t+=G.over?0:dt;const c=G.car,L=G.L;
  const {thr,steer}=G.over?{thr:0,steer:0}:controls();c.rev=Math.max(0,c.rev-dt);
  const fx=Math.cos(c.a),fy=Math.sin(c.a),rx=-fy,ry=fx;let vF=c.vx*fx+c.vy*fy,vR=c.vx*rx+c.vy*ry;
@@ -201,7 +203,7 @@ function update(dt){if(!G)return;G.t+=G.over?0:dt;const c=G.car,L=G.L;
  if(thr>0){if(vF<-10)vF+=BRK*dt*thr;else if(vF<maxF)vF+=ACC*dt*thr*(1-Math.max(0,vF)/(maxF*1.15))}else if(thr<0){if(vF>10)vF+=BRK*dt*thr;else vF=Math.max(vF+RACC*dt*thr,-130)}
  vF*=1-dt*(thr===0?1.4:.25);if(vF>maxF)vF-=(vF-maxF)*3*dt;
  const grip=grass?3.5:(Math.abs(steer)>.55&&Math.abs(vF)>170?4.2:9);vR*=Math.exp(-grip*dt);
- const sf=clamp(.42+Math.abs(vF)/150,.42,1);c.av=lerp(c.av,steer*3.1*sf*(vF<-5?-1:1),clamp(dt*14,0,1));c.a+=c.av*dt;
+ c.ss=lerp(c.ss||0,steer,clamp(dt*STEER_SMOOTH,0,1));const sf=clamp(.42+Math.abs(vF)/150,.42,1);c.av=lerp(c.av,c.ss*STEER_RATE*sf*(vF<-5?-1:1),clamp(dt*STEER_RESP,0,1));c.a+=c.av*dt;
  c.vx=fx*vF+rx*vR;c.vy=fy*vF+ry*vR;
  if(Math.abs(vR)>70&&Math.abs(vF)>60){const bx=-fx*12,by=-fy*12;for(const s of [-1,1])G.skids.push({x:c.x+bx+rx*7*s,y:c.y+by+ry*7*s,a:c.a,t:4});if(G.skids.length>500)G.skids.splice(0,G.skids.length-500)}
  c.x+=c.vx*dt;c.y+=c.vy*dt;let hit=0;
@@ -252,8 +254,12 @@ function botDir(){const c=G.car,s=G.L.st[G.si];if(!s)return null;const tx=Math.f
  const P=G.bot.path;if(!P||!P.length)return[s.p.x-c.x,s.p.y-c.y,.6];
  let bi=0,bd=1e9;for(let k=0;k<Math.min(P.length,12);k++){const px=(P[k]%N+.5)*TS,py=((P[k]/N|0)+.5)*TS,d=Math.hypot(px-c.x,py-c.y);if(d<bd){bd=d;bi=k}}
  const j=Math.min(P.length-1,bi+2),px=(P[j]%N+.5)*TS,py=((P[j]/N|0)+.5)*TS;
- let turn=false;for(let k=bi;k<Math.min(P.length-2,bi+4);k++){if((P[k+1]-P[k])!==(P[k+2]-P[k+1]))turn=true}
- const sp=Math.hypot(c.vx,c.vy);let mag=turn?(sp>150?.15:.6):1;return[px-c.x,py-c.y,mag]}
+ // QA autopilot speed plan: brake to a corner speed the current turn rate can hold, then accelerate out (QA-only; players never use this)
+ let kt=-1;for(let k=bi;k<P.length-2;k++){if((P[k+1]-P[k])!==(P[k+2]-P[k+1])){kt=k+1;break}}
+ const sp=Math.hypot(c.vx,c.vy),VC=(window.__botVC||140)*STEER_RATE/3.1;let mag=1;
+ if(kt>=0){const cx=(P[kt]%N+.5)*TS,cyy=((P[kt]/N|0)+.5)*TS,dc=Math.max(0,Math.hypot(cx-c.x,cyy-c.y)-TS*.5),vmax=Math.sqrt(VC*VC+2*BRK*.5*dc);
+  if(sp>vmax+15)mag=-.7;else if(sp>vmax)mag=0;else if(dc<TS*.6)mag=.6}
+ return[px-c.x,py-c.y,mag]}
 window.__ft={get state(){return state},get G(){return G},get RES(){return RES},LV,PL,save:()=>save,openLevel,startPlay,go,buildLevel,unlocked,
  bot(on=true){if(G)G.bot=on?{}:null},sim(sec,step=1/60){let n=Math.round(sec/step);while(n-->0&&state==='play'){update(step)}return state},
  conesOk(){return LV.map((L,i)=>{const g=buildLevel(i);return{i,cams:g.cams.length,want:L.cams,sweep:g.cams.filter(c=>c.amp).length,par:g.par,len:g.len}})},
