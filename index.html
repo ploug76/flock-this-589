@@ -20,7 +20,7 @@ addEventListener('beforeinstallprompt',e=>{e.preventDefault();e.stopImmediatePro
 'use strict';
 // ===== Flock This — original top-down errand-driving game. All art is drawn with canvas shapes (plus system emoji for cargo icons).
 const BRAND="A five8nine Studios game \u00b7 589-studios",IS589=true,AD_URL="https://589studios.github.io/589-studios/#order";
-const cv=document.getElementById('c'),X=cv.getContext('2d'),SPEL=document.getElementById('sp'),ADEL=document.getElementById('ad');if(ADEL)ADEL.addEventListener('click',e=>{if(performance.now()-(window.__skipT||0)<800){e.preventDefault();e.stopPropagation()}},true);
+const cv=document.getElementById('c'),X=cv.getContext('2d'),SPEL=document.getElementById('sp'),ADEL=document.getElementById('ad');const AD_GUARD=1500;if(ADEL){ADEL.addEventListener('pointerdown',e=>{window.__adDownT=performance.now()},true);ADEL.addEventListener('click',e=>{const n=performance.now(),sh=window.__adShowT||0,dn=window.__adDownT||0;/* ad ignores taps for 1.5s after it appears, and only a fresh touch that began on it after that counts (a held or repeated skip tap can't open it) */const ok=n-(window.__skipT||-1e9)>=AD_GUARD&&n-sh>=AD_GUARD&&(e.detail===0||dn-sh>=AD_GUARD);if(!ok){e.preventDefault();e.stopPropagation()}},true)}
 let W=0,H=0,DPR=1;
 function resize(){DPR=Math.min(3,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);cv.style.width=W+'px';cv.style.height=H+'px'}
 addEventListener('resize',resize);resize();
@@ -392,7 +392,7 @@ function logo(cx,cy,sz){X.save();const g=X.createLinearGradient(0,cy-sz/2,0,cy+s
  X.strokeText('THIS',cx,cy+sz*.95);X.fillText('THIS',cx,cy+sz*.95);X.restore();
  // eye + cone mascot
  const ex=cx+w1/2+sz*.15,ey=cy-sz*.55;X.save();X.beginPath();X.moveTo(ex,ey);X.arc(ex,ey,sz*1.2,Math.PI*.55,Math.PI*.95);X.closePath();X.fillStyle='rgba(230,40,40,.35)';X.fill();X.strokeStyle='rgba(255,80,80,.9)';X.lineWidth=2;X.stroke();X.restore();eye(ex,ey,sz*.3)}
-function adLayout(x,y,w){if(!ADEL)return 0;ADEL.style.display='block';ADEL.style.left=Math.round(x)+'px';ADEL.style.top=Math.round(y)+'px';ADEL.style.width=Math.round(w)+'px';const h=ADEL.offsetHeight;menuBtns.push({x,y,w,h});return h}
+function adLayout(x,y,w){if(!ADEL)return 0;if(!window.__adVis)window.__adShowT=performance.now();window.__adSeen=1;ADEL.style.pointerEvents=(performance.now()-(window.__adShowT||0)<AD_GUARD)?'none':'';ADEL.style.display='block';ADEL.style.left=Math.round(x)+'px';ADEL.style.top=Math.round(y)+'px';ADEL.style.width=Math.round(w)+'px';const h=ADEL.offsetHeight;menuBtns.push({x,y,w,h});return h}
 function drawTitle(t){const s=S();bgCity(t);const port=H>W;const cx=s.l+s.w/2;
  const sz=Math.min(78,s.w*.17,s.h*.15);const ly=port?s.t+Math.max(110,s.h*.17):s.t+Math.max(70,s.h*.2);logo(cx,ly,sz);
  txt('Run the errands. Dodge the cameras.',cx,ly+sz*1.75,Math.min(22,s.w*.05),'#ffd7d7','center','bold',s.w-30);
@@ -578,8 +578,9 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;T0+=dt;state
  if(state==='play'&&G&&!G.botFast){let k=Math.ceil(dt/(1/120));for(let i=0;i<k;i++)update(dt/k)}
  if(state==='bust'&&!window.__bustHold)bustUpdate(dt);
  music(dt);if(state!=='play'&&ENGG&&AC)ENGG.gain.setTargetAtTime(0,AC.currentTime,.05);
- BTNDEF=[];menuBtns=[];X.setTransform(DPR,0,0,DPR,0,0);X.fillStyle='#16171b';X.fillRect(0,0,W,H);if(ADEL)ADEL.style.display='none';
+ BTNDEF=[];menuBtns=[];X.setTransform(DPR,0,0,DPR,0,0);X.fillStyle='#16171b';X.fillRect(0,0,W,H);if(ADEL)ADEL.style.display='none';window.__adSeen=0;
  try{if(state==='title')drawTitle(T0);else if(state==='how')drawHow(T0);else if(state==='levels')drawLevels(T0);else if(state==='intro')drawIntro(T0);else if(state==='play')drawPlay(T0);else if(state==='pause')drawPause(T0);else if(state==='bust')drawBust(T0);else if(state==='result')drawResult(T0)}catch(e){console.error(e)}
+ window.__adVis=window.__adSeen;
  requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
 if('serviceWorker' in navigator&&location.protocol==='https:'){const had=!!navigator.serviceWorker.controller;
