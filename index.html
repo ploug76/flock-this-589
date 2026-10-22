@@ -10,10 +10,10 @@ if(v&&v!=='0')sessionStorage.setItem(K,v.replace(/[^a-z0-9-]/gi,'').slice(0,16)|
 const s=sessionStorage.getItem(K);window.__SAMPLE=s||null;if(!s)return;
 document.querySelectorAll('link[rel=manifest]').forEach(l=>l.remove());
 if('serviceWorker' in navigator){try{navigator.serviceWorker.register=()=>new Promise(()=>{})}catch(e){}}
-addEventListener('beforeinstallprompt',e=>{e.preventDefault();e.stopImmediatePropagation()},true);window.__ACS=[];['AudioContext','webkitAudioContext'].forEach(n=>{const O=window[n];if(!O)return;const W=function(...a){const c=new O(...a);window.__ACS.push(c);return c};W.prototype=O.prototype;try{Object.setPrototypeOf(W,O)}catch(e){}window[n]=W})}catch(e){}})()</script><!--/sample--></head><body><canvas id="c" aria-label="Flock This game"></canvas><div id="sp"></div><a id="ad" href="https://ploug76.github.io/589-studios/#order" target="_blank" rel="noopener" aria-label="Order a custom game from five8nine Studios">🎮 Want a game starring YOU?<small>ORDER A CUSTOM GAME from five8nine Studios ▶</small></a><script>
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();e.stopImmediatePropagation()},true);window.__ACS=[];['AudioContext','webkitAudioContext'].forEach(n=>{const O=window[n];if(!O)return;const W=function(...a){const c=new O(...a);window.__ACS.push(c);return c};W.prototype=O.prototype;try{Object.setPrototypeOf(W,O)}catch(e){}window[n]=W})}catch(e){}})()</script><!--/sample--></head><body><canvas id="c" aria-label="Flock This game"></canvas><div id="sp"></div><a id="ad" href="https://589studios.github.io/589-studios/#order" target="_blank" rel="noopener" aria-label="Order a custom game from five8nine Studios">🎮 Want a game starring YOU?<small>ORDER A CUSTOM GAME from five8nine Studios ▶</small></a><script>
 'use strict';
 // ===== Flock This — original top-down errand-driving game. All art is drawn with canvas shapes (plus system emoji for cargo icons).
-const BRAND="A five8nine Studios game \u00b7 589-studios",IS589=true,AD_URL="https://ploug76.github.io/589-studios/#order";
+const BRAND="A five8nine Studios game \u00b7 589-studios",IS589=true,AD_URL="https://589studios.github.io/589-studios/#order";
 const cv=document.getElementById('c'),X=cv.getContext('2d'),SPEL=document.getElementById('sp'),ADEL=document.getElementById('ad');
 let W=0,H=0,DPR=1;
 function resize(){DPR=Math.min(3,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);cv.style.width=W+'px';cv.style.height=H+'px'}
@@ -159,7 +159,7 @@ cv.addEventListener('pointerdown',e=>{e.preventDefault();audioInit();const p={x:
  if(state==='bust'){ptr.delete(e.pointerId);if(BUST&&BUST.t>=BUST_SKIP){SND.click();endBust()}return}
  const b=btnAt(p.x,p.y);if(b){p.btn=b.id;return}
  if(state==='play'&&save.ctl==='stick'&&!stick&&!G.over){stick={id:e.pointerId,x0:p.x,y0:p.y,x:p.x,y:p.y}}},{passive:false});
-addEventListener('pointermove',e=>{const p=ptr.get(e.pointerId);if(!p)return;p.x=e.clientX;p.y=e.clientY;if(stick&&stick.id===e.pointerId){stick.x=p.x;stick.y=p.y;const dx=p.x-stick.x0,dy=p.y-stick.y0,d=Math.hypot(dx,dy),M=70;if(d>M){stick.x0+=dx*(1-M/d);stick.y0+=dy*(1-M/d)}}},{passive:true});
+addEventListener('pointermove',e=>{const p=ptr.get(e.pointerId);if(!p)return;if(state==='how'&&!p.btn&&HOWMAX>0)HOWY=clamp(HOWY-(e.clientY-p.y),0,HOWMAX);p.x=e.clientX;p.y=e.clientY;if(stick&&stick.id===e.pointerId){stick.x=p.x;stick.y=p.y;const dx=p.x-stick.x0,dy=p.y-stick.y0,d=Math.hypot(dx,dy),M=70;if(d>M){stick.x0+=dx*(1-M/d);stick.y0+=dy*(1-M/d)}}},{passive:true});
 function pend(e){const p=ptr.get(e.pointerId);if(!p)return;ptr.delete(e.pointerId);if(stick&&stick.id===e.pointerId)stick=null;if(p.btn&&e.type==='pointerup'){const b=btnAt(e.clientX,e.clientY);if(b&&b.id===p.btn){SND.click();b.cb()}}}
 addEventListener('pointerup',pend);addEventListener('pointercancel',pend);
 addEventListener('blur',()=>{ptr.clear();stick=null;for(const k in keys)keys[k]=false});
@@ -174,7 +174,7 @@ function unlocked(i){if(SAMPLE&&i>=SAMPLE_LEVELS)return false;if(QA||i===0)retur
 
 // ===== state =====
 let state='title',prevState=null,stateT=0;
-function go(s){prevState=state;if(prevState==='result'&&s!=='result'){try{window.PALB&&PALB.isOpen()&&PALB.close()}catch(e){}}state=s;stateT=0;stick=null;try{window.__dock&&__dock.tick()}catch(e){}}
+function go(s){prevState=state;if(s!=='result'){try{document.body.style.removeProperty('--ftL');document.body.style.removeProperty('--ftT')}catch(e){}}if(prevState==='result'&&s!=='result'){try{window.PALB&&PALB.isOpen()&&PALB.close()}catch(e){}}state=s;stateT=0;stick=null;try{window.__dock&&__dock.tick()}catch(e){}}
 function openLevel(i){if(!unlocked(i)){if(SAMPLE&&i>=SAMPLE_LEVELS){window.__smpWant=1;toastMsg('Sample: levels 1–'+SAMPLE_LEVELS+' are free. Unlock the full game for all '+LV.length+'!')}else toastMsg('Finish level '+i+' first!');return}LVI=i;buildLevel(i);go('intro')}
 function startPlay(){if(!G||G.li!==LVI)buildLevel(LVI);go('play');addToast('GO!','#7CFC9A',1.2);G.hint=3.5}
 function togglePause(){if(state==='play')go('pause');else if(state==='pause')go('play')}
@@ -271,7 +271,8 @@ window.__ft={get state(){return state},get G(){return G},get RES(){return RES},L
 // ===== drawing helpers =====
 function rr(x,y,w,h,r){X.beginPath();X.moveTo(x+r,y);X.arcTo(x+w,y,x+w,y+h,r);X.arcTo(x+w,y+h,x,y+h,r);X.arcTo(x,y+h,x,y,r);X.arcTo(x,y,x+w,y,r);X.closePath()}
 function txt(s,x,y,sz,col='#fff',al='center',wt='bold',maxW=0,stroke=true){X.font=wt+' '+sz+'px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';X.textAlign=al;X.textBaseline='middle';
- if(maxW){let w=X.measureText(s).width;if(w>maxW){const k=maxW/w;X.font=wt+' '+Math.max(10,Math.floor(sz*k))+'px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif'}}
+ if(maxW){let w=X.measureText(s).width;if(w>maxW){const k=maxW/w;X.font=wt+' '+Math.max(Math.min(sz,16),Math.floor(sz*k))+'px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';/*qa-kwc-fix*/
+  if(X.measureText(s).width>maxW){let a=Array.from(s);while(a.length>1&&X.measureText(a.join('')+'…').width>maxW)a.pop();s=a.join('').trimEnd()+'…'}}}
  if(stroke){X.lineWidth=Math.max(3,sz/5);X.strokeStyle='rgba(0,0,0,.75)';X.lineJoin='round';X.strokeText(s,x,y)}X.fillStyle=col;X.fillText(s,x,y)}
 function wrapTxt(s,maxW,sz){X.font='bold '+sz+'px system-ui,-apple-system,sans-serif';const words=s.split(' '),out=[];let l='';for(const w of words){const t=l?l+' '+w:w;if(X.measureText(t).width>maxW&&l){out.push(l);l=w}else l=t}if(l)out.push(l);return out}
 function button(id,x,y,w,h,label,col,cb,o={}){BTNDEF.push({id,x,y,w,h,cb,dis:o.dis});menuBtns.push({x,y,w,h});const pr=[...ptr.values()].some(p=>p.btn===id);
@@ -308,7 +309,8 @@ function drawWorld(camx,camy,Z,cy0,t){const vx0=camx-(W/2)/Z,vy0=camy-cy0/Z,vx1=
   const pl=PLB[b.by*6+b.bx];if(pl)for(const p of pl){let ax,ay,aw,ah;const L=120;if(p.side==='S'){ax=x0+sz/2-L/2;ay=y0+sz-12;aw=L;ah=12}else if(p.side==='N'){ax=x0+sz/2-L/2;ay=y0;aw=L;ah=12}else if(p.side==='E'){ax=x0+sz-12;ay=y0+sz/2-L/2;aw=12;ah=L}else{ax=x0;ay=y0+sz/2-L/2;aw=12;ah=L}
    X.fillStyle=p.col;X.fillRect(ax,ay,aw,ah);X.fillStyle='rgba(255,255,255,.35)';for(let k=0;k<6;k++){if(aw>ah)X.fillRect(ax+k*20,ay,10,ah);else X.fillRect(ax,ay+k*20,aw,10)}
    const lx=p.side==='E'?x0+sz-70:p.side==='W'?x0+70:x0+sz/2,ly=p.side==='S'?y0+sz-46:p.side==='N'?y0+46:y0+sz/2;
-   X.fillStyle='rgba(0,0,0,.55)';rr(lx-60,ly-30,120,60,10);X.fill();txt(p.ic,lx,ly-10,24,'#fff','center','normal',0,false);txt(p.name,lx,ly+16,14,p.col,'center','bold',112)}}
+   const fs=Math.max(14,16.5/Z);X.font='bold '+fs+'px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';const lw=Math.min(sz-8,Math.max(120,X.measureText(p.name).width+16)),lh=Math.max(60,fs+46),lx2=clamp(lx,x0+4+lw/2,x0+sz-4-lw/2);
+   X.fillStyle='rgba(0,0,0,.55)';rr(lx2-lw/2,ly-30,lw,lh,10);X.fill();txt(p.ic,lx2,ly-10,24,'#fff','center','normal',0,false);txt(p.name,lx2,ly+12+fs/2,fs,p.col,'center','bold',lw-8)}}
  }
 function drawRoute(){if(!G||G.si>=G.L.st.length)return;const c=G.car,tx=Math.floor(c.x/TS),ty=Math.floor(c.y/TS),k=ty*N+tx,s=G.L.st[G.si];
  if(!G.route||G.routeTile!==k){if(drv(tx,ty)){G.route=pathTo(tx,ty,s.p.tx,s.p.ty);G.routeTile=k}}const P=G.route;if(!P)return;
@@ -321,7 +323,7 @@ function drawWorldFx(t){
  // stops
  for(let i=G.si;i<G.L.st.length;i++){const s=G.L.st[i],cur=i===G.si,pu=1+Math.sin(t*5)*.12;if(!cur&&i>G.si+2)continue;
   X.save();X.globalAlpha=cur?1:.5;X.beginPath();X.arc(s.p.x,s.p.y,(cur?30*pu:20),0,TAU);X.fillStyle=cur?'rgba(80,220,120,.28)':'rgba(255,255,255,.12)';X.fill();X.lineWidth=cur?4:2;X.strokeStyle=cur?'#7CFC9A':'#ddd';X.setLineDash(cur?[8,6]:[4,4]);X.lineDashOffset=t*20;X.stroke();X.setLineDash([]);
-  txt(cur?s.p.ic:String(i+1),s.p.x,s.p.y,cur?26:16,'#fff','center','bold',0,!cur);X.restore()}
+  txt(cur?s.p.ic:String(i+1),s.p.x,s.p.y,cur?26:Math.max(16,16.5/zoom()),'#fff','center','bold',0,!cur);X.restore()}
  for(const cm of G.cams)drawCone(cm,t);
  for(const p of G.pats){X.save();X.beginPath();const px=p.x+Math.cos(p.a)*16,py=p.y+Math.sin(p.a)*16;X.moveTo(px,py);X.arc(px,py,150,p.a-.4,p.a+.4);X.closePath();X.fillStyle='rgba(255,60,60,'+(.18+(p.read||0)*.3)+')';X.fill();X.strokeStyle='rgba(255,90,90,.7)';X.lineWidth=2;X.setLineDash([6,6]);X.stroke();X.restore();drawCar(p.x,p.y,p.a,'#f4f4f4',true,t)}
  const c=G.car;X.save();X.globalAlpha=.18;X.fillStyle='#fff3b0';X.beginPath();const hx=c.x+Math.cos(c.a)*16,hy=c.y+Math.sin(c.a)*16;X.moveTo(hx,hy);X.arc(hx,hy,70,c.a-.35,c.a+.35);X.fill();X.restore();
@@ -337,23 +339,24 @@ function drawPlay(t){const s=S(),Z=zoom(),port=H>W,cy0=port?H*.56:(hudTop()+s.b)
   X.save();X.translate(ex,ey);X.rotate(ang);X.fillStyle='#7CFC9A';X.beginPath();X.moveTo(22,0);X.lineTo(-8,-14);X.lineTo(-8,14);X.closePath();X.fill();X.strokeStyle='#000';X.lineWidth=2;X.stroke();X.restore();txt(st.p.ic,ex-Math.cos(ang)*26,ey-Math.sin(ang)*26,22,'#fff','center','normal',0,false)}}
  if(G.flash>0){const g=X.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.7);g.addColorStop(0,'rgba(255,0,0,0)');g.addColorStop(1,'rgba(255,0,0,'+(G.flash*.9)+')');X.fillStyle=g;X.fillRect(0,0,W,H)}
  drawHUD(s,t);drawControls(s,t);
- let ty2=port?s.t+250:hudTop()+40;for(const to of G.toasts){const a=clamp(to.t*2,0,1);X.globalAlpha=a;txt(to.s,W/2,ty2,to.big?28:22,to.col,'center','bold',s.w-20);ty2+=to.big?38:30}X.globalAlpha=1}
+ let ty2=port?s.t+272:hudTop()+40;for(const to of G.toasts){const a=clamp(to.t*2,0,1);X.globalAlpha=a;txt(to.s,W/2,ty2,to.big?28:22,to.col,'center','bold',s.w-20);ty2+=to.big?38:30}X.globalAlpha=1}
 function stopAct(st){if(st.get.length&&st.drop.length)return'Drop '+st.drop.map(d=>IT[d][1]).join('')+' & get '+st.get.map(g=>IT[g][1]).join('');if(st.drop.length)return'Deliver '+st.drop.map(d=>IT[d][1]).join('');if(st.get.length)return'Pick up '+st.get.map(g=>IT[g][1]+' '+IT[g][0]).filter((v,i,a)=>a.indexOf(v)===i).join(', ');return'Stop by'}
 function hudArrow(x,y,st,c){const ang=Math.atan2(st.p.y-c.y,st.p.x-c.x),d=Math.hypot(st.p.y-c.y,st.p.x-c.x);X.save();X.translate(x,y);X.rotate(ang);X.fillStyle='#7CFC9A';X.beginPath();X.moveTo(17,0);X.lineTo(-11,-12);X.lineTo(-5,0);X.lineTo(-11,12);X.closePath();X.fill();X.restore();return Math.round(d/TS*10)+' m'}
 function heatBar(hx,hy,hw){X.fillStyle='#333';rr(hx,hy,hw,16,8);X.fill();X.fillStyle=G.heat>66?'#ff3030':G.heat>33?'#ff9a2e':'#ffd23f';rr(hx,hy,Math.max(16,hw*G.heat/100),16,8);if(G.heat>0)X.fill();X.lineWidth=2;X.strokeStyle='#fff';rr(hx,hy,hw,16,8);X.stroke()}
-function hudTop(){const s=S();return H>W?s.t+8+54+8+78:s.t+8+56}
+function hudTop(){const s=S();return H>W?s.t+8+76+8+78:s.t+8+56}
 function drawHUD(s,t){const port=H>W,c=G.car,L=G.L,st=L.st[G.si];const pad=8,x0=s.l+pad,w=s.w-pad*2,over=G.t>G.par;
  button('pause',s.r-6-44-48,s.t+pad+5,44,44,'⏸','#3a3f4f',()=>togglePause(),{sz:20});button('mute',s.r-6-44,s.t+pad+5,44,44,save.muted?'🔇':'🔊','#3a3f4f',()=>setMute(!save.muted),{sz:20});
  const cargo='Cargo: '+(G.cargo.length?G.cargo.map(k=>IT[k][1]).join(' '):'empty');let mmY;
- if(port){const topH=54,bw=w-112;X.fillStyle='rgba(12,12,16,.82)';rr(x0,s.t+pad,bw,topH,12);X.fill();
-  txt('L'+(G.li+1)+' '+L.n,x0+12,s.t+pad+17,17,'#fff','left','bold',bw*.52);txt('⏱ '+fmt(G.t),x0+12,s.t+pad+40,18,over?'#ff8080':'#fff','left');txt('par '+fmt(G.par),x0+92,s.t+pad+40,16,'#bbb','left','600');
-  const hx=x0+bw*.58,hw=bw*.42-12;txt('HEAT',hx,s.t+pad+16,15,'#ffb0b0','left');txt('📸×'+G.spots,hx+hw,s.t+pad+16,16,'#fff','right');heatBar(hx,s.t+pad+30,hw);
-  if(st){const cy=s.t+pad+topH+8,ch=78;X.fillStyle='rgba(12,12,16,.82)';rr(x0,cy,w,ch,12);X.fill();X.lineWidth=2;X.strokeStyle='#7CFC9A';X.stroke();const m=hudArrow(x0+30,cy+ch/2-6,st,c);txt(m,x0+30,cy+ch-12,14,'#bfe','center');
+ if(port){const topH=76,bw=w-112;X.fillStyle='rgba(12,12,16,.82)';rr(x0,s.t+pad,bw,topH,12);X.fill();
+  txt('L'+(G.li+1)+' '+L.n,x0+12,s.t+pad+16,17,'#fff','left','bold',bw-24);const tt='⏱ '+fmt(G.t);txt(tt,x0+12,s.t+pad+39,18,over?'#ff8080':'#fff','left');const tw=X.measureText(tt).width;
+  txt('📸×'+G.spots,x0+bw-12,s.t+pad+39,16,'#fff','right');const sw=X.measureText('📸×'+G.spots).width;txt('par '+fmt(G.par),x0+12+tw+12,s.t+pad+39,16,'#bbb','left','600',bw-24-tw-12-sw-10);
+  txt('HEAT',x0+12,s.t+pad+63,16,'#ffb0b0','left');const hx=x0+12+X.measureText('HEAT').width+10;heatBar(hx,s.t+pad+55,x0+bw-12-hx);
+  if(st){const cy=s.t+pad+topH+8,ch=78;X.fillStyle='rgba(12,12,16,.82)';rr(x0,cy,w,ch,12);X.fill();X.lineWidth=2;X.strokeStyle='#7CFC9A';X.stroke();const m=hudArrow(x0+30,cy+ch/2-8,st,c);txt(m,x0+30,cy+ch-14,16,'#bfe','center');
    txt('Stop '+(G.si+1)+'/'+L.st.length+': '+stopAct(st),x0+60,cy+18,17,'#fff','left','bold',w-70);txt((st.drop.length?'to ':st.get.length?'at ':'')+st.p.ic+' '+st.p.name,x0+60,cy+42,17,'#7CFC9A','left','bold',w-70);txt(cargo,x0+60,cy+64,16,'#ddd','left','600',w-70);mmY=cy+ch+8}}
  else{const aw=Math.min(300,w*.36),topH=56;X.fillStyle='rgba(12,12,16,.82)';rr(x0,s.t+pad,aw,topH,12);X.fill();
-  txt('L'+(G.li+1)+' '+L.n,x0+10,s.t+pad+16,16,'#fff','left','bold',aw-80);txt('📸×'+G.spots,x0+aw-10,s.t+pad+16,16,'#fff','right');txt('⏱ '+fmt(G.t),x0+10,s.t+pad+40,17,over?'#ff8080':'#fff','left');txt('/'+fmt(G.par),x0+82,s.t+pad+40,15,'#bbb','left','600');
-  txt('HEAT',x0+aw*.5,s.t+pad+40,13,'#ffb0b0','left');heatBar(x0+aw*.5+38,s.t+pad+32,aw*.5-48);
-  if(st){const cx=x0+aw+8,cw=s.r-6-100-cx-4,cy=s.t+pad;X.fillStyle='rgba(12,12,16,.82)';rr(cx,cy,cw,topH,12);X.fill();X.lineWidth=2;X.strokeStyle='#7CFC9A';X.stroke();const m=hudArrow(cx+26,cy+20,st,c);txt(m,cx+26,cy+45,13,'#bfe','center');
+  txt('L'+(G.li+1)+' '+L.n,x0+10,s.t+pad+16,16,'#fff','left','bold',aw-80);txt('📸×'+G.spots,x0+aw-10,s.t+pad+16,16,'#fff','right');const tt='⏱ '+fmt(G.t);txt(tt,x0+10,s.t+pad+40,17,over?'#ff8080':'#fff','left');const tx2=x0+10+X.measureText(tt).width+3;txt('/'+fmt(G.par),tx2,s.t+pad+40,16,'#bbb','left','600');
+  const hx=Math.max(x0+aw*.47,tx2+X.measureText('/'+fmt(G.par)).width+10);txt('HEAT',hx,s.t+pad+40,16,'#ffb0b0','left');const hb=hx+X.measureText('HEAT').width+8;heatBar(hb,s.t+pad+32,x0+aw-10-hb);
+  if(st){const cx=x0+aw+8,cw=s.r-6-100-cx-4,cy=s.t+pad;X.fillStyle='rgba(12,12,16,.82)';rr(cx,cy,cw,topH,12);X.fill();X.lineWidth=2;X.strokeStyle='#7CFC9A';X.stroke();const m=hudArrow(cx+26,cy+19,st,c);txt(m,cx+26,cy+44,16,'#bfe','center');
    txt('Stop '+(G.si+1)+'/'+L.st.length+': '+stopAct(st),cx+54,cy+16,16,'#fff','left','bold',cw-62);txt((st.drop.length?'to ':st.get.length?'at ':'')+st.p.ic+' '+st.p.name+'   '+cargo,cx+54,cy+40,16,'#7CFC9A','left','bold',cw-62)}mmY=s.t+pad+topH+8}
  if(st){if(!MINI)miniMap();const ms=port?92:80,mx=s.r-pad-ms,my=mmY;X.globalAlpha=.88;X.drawImage(MINI,mx,my,ms,ms);X.globalAlpha=1;X.lineWidth=2;X.strokeStyle='#fff';X.strokeRect(mx,my,ms,ms);const k=ms/(N*TS);
   for(const cm of G.cams){X.fillStyle='#ff3b3b';X.fillRect(mx+cm.x*k-1.5,my+cm.y*k-1.5,3,3)}for(const p of G.pats){X.fillStyle='#5aa0ff';X.fillRect(mx+p.x*k-2,my+p.y*k-2,4,4)}
@@ -387,40 +390,51 @@ function drawTitle(t){const s=S();bgCity(t);const port=H>W;const cx=s.l+s.w/2;
  else{const bw2=Math.min(230,(s.w-60)/3);const x1=cx-bw2*1.5-10;button('play',x1,by,bw2,bh,'▶ PLAY','#2fae4a',()=>go('levels'),{sz:24});button('how',x1+bw2+10,by,bw2,bh,'❓ HOW TO PLAY','#3a62c9',()=>go('how'));
   button('ctl',x1+2*bw2+20,by,bw2,bh,'🎮 '+(save.ctl==='stick'?'Touch Stick':'Buttons'),'#6a4bc9',()=>{save.ctl=save.ctl==='stick'?'btns':'stick';persist()});by+=bh+gap}
  button('mute',s.r-6-44,s.t+8,44,44,save.muted?'🔇':'🔊','#3a3f4f',()=>setMute(!save.muted),{sz:20});
- const ts=totalStars();txt('★ '+ts+' / '+LV.length*3+' stars',cx,by+12,18,'#ffe14a');by+=34;
+ const ts=totalStars(),stS='★ '+ts+' / '+LV.length*3+' stars';
+ if(IS589&&!port){const aw=Math.min(360,s.w*.44),h=adLayout(s.r-aw-10,0,aw),ay=s.b-h-8;ADEL.style.top=Math.round(ay)+'px';menuBtns[menuBtns.length-1].y=ay;
+  const fx=s.l+14,fw=s.r-aw-10-14-fx;txt(stS,fx,s.b-(SAMPLE?64:40),18,'#ffe14a','left','bold',fw);txt(BRAND,fx,s.b-16,16,'#bbb','left','600',fw);if(SAMPLE)txt('Sample version: levels 1–'+SAMPLE_LEVELS+' are free',fx,s.b-40,16,'#fff','left','bold',fw);return}
+ txt(stS,cx,by+12,18,'#ffe14a');by+=34;
  if(IS589){const aw=Math.min(360,s.w-30);const h=adLayout(cx-aw/2,Math.min(by,s.b-110),aw);by=Math.min(by,s.b-110)+h+10}
  txt(BRAND,cx,s.b-16,16,'#bbb','center','600',s.w-20);if(SAMPLE)txt('Sample version: levels 1–'+SAMPLE_LEVELS+' are free',cx,s.b-40,16,'#fff','center','bold',s.w-20)}
-function drawHow(t){const s=S();bgCity(t);const pw=Math.min(560,s.w-20),ph=s.h-20,px=s.l+(s.w-pw)/2,py=s.t+10;panel(px,py,pw,ph);
+let HOWY=0,HOWMAX=0;addEventListener('wheel',e=>{if(state==='how'){HOWY=clamp(HOWY+e.deltaY,0,HOWMAX)}},{passive:true});
+function drawHow(t){const s=S();bgCity(t);const port=H>W,pw=port?Math.min(560,s.w-20):Math.min(820,s.w-20),ph=s.h-20,px=s.l+(s.w-pw)/2,py=s.t+10;panel(px,py,pw,ph);
  txt('HOW TO PLAY',px+pw/2,py+30,26,'#ffe14a');const L=[['🚗','Drive around town and finish every errand stop, in order.'],['🟢','Follow the green arrow, the blue dotted GPS line and the minimap to the next stop.'],
  ['👁️','Flock cameras watch the roads. Stay OUT of the red cones!'],['📸','Driving through a cone reads your plate and adds HEAT. Too much heat and you are BUSTED.'],['🔄','Some cameras sweep back and forth. Time it, or take another street.'],
  ['🚓','Later, patrol cars cruise around. Stay out of their headlights.'],['⭐','Stars: 1 for finishing, 1 for beating par time, 1 for never getting spotted.'],
  ['🎮',(save.ctl==='stick'?'Touch & drag anywhere: the car drives the way you point.':'Buttons: ◀ ▶ steer, GAS and BRAKE (hold BRAKE to back up).')+' Keyboard: arrows or WASD, P pauses, M mutes.']];
- const port=H>W,cols=port||pw<520?1:2;const cw=(pw-30)/cols;let y=py+62,col=0,yy=[y,y];const fs=16;
- for(const [ic,tx] of L){const c=cols===2?(yy[0]<=yy[1]?0:1):0;const lines=wrapTxt(tx,cw-44,fs);const x=px+15+c*cw;txt(ic,x+14,yy[c]+12,22,'#fff','center','normal',0,false);
-  lines.forEach((l,k)=>txt(l,x+36,yy[c]+12+k*21,fs,'#fff','left','600',0,false));yy[c]+=Math.max(30,lines.length*21+10)}
- const bh=52;button('back',px+pw/2-110,Math.min(py+ph-bh-12,Math.max(...yy)+8),220,bh,'◀ BACK','#3a62c9',()=>go('title'))}
+ const cols=port||pw<520?1:2;const cw=(pw-30)/cols,fs=16,bh=52,top=py+56,bot=port?py+ph-bh-20:py+ph-10;
+ const items=L.map(([ic,tx])=>({ic,lines:wrapTxt(tx,cw-44,fs)}));let yy=[0,0];for(const it of items){const c=cols===2?(yy[0]<=yy[1]?0:1):0;it.c=c;it.y=yy[c];yy[c]+=Math.max(30,it.lines.length*21+10)}
+ const ch=Math.max(...yy);HOWMAX=Math.max(0,ch-(bot-top));HOWY=clamp(HOWY,0,HOWMAX);
+ X.save();X.beginPath();X.rect(px+4,top-4,pw-8,bot-top+4);X.clip();
+ for(const it of items){const x=px+15+it.c*cw,y0=top+it.y-HOWY;txt(it.ic,x+14,y0+12,22,'#fff','center','normal',0,false);it.lines.forEach((l,k)=>txt(l,x+36,y0+12+k*21,fs,'#fff','left','600',0,false))}
+ X.restore();if(HOWMAX>0)txt(HOWY<HOWMAX?'▼ drag for more':'▲ drag back up',px+pw-16,py+30,16,'#bbb','right','600',0,false);
+ if(port)button('back',px+pw/2-110,Math.min(py+ph-bh-12,top+ch-HOWY+8),220,bh,'◀ BACK','#3a62c9',()=>go('title'));
+ else button('back',px+10,py+8,120,44,'◀ BACK','#3a62c9',()=>go('title'),{sz:18})}
 function drawLevels(t){const s=S();bgCity(t);const port=H>W;txt('CHOOSE A LEVEL',s.l+s.w/2,s.t+34,26,'#ffe14a');button('back',s.l+8,s.t+8+(port?0:0),96,44,'◀ Back','#3a62c9',()=>go('title'),{sz:18});
  const cols=port?3:7,gap=10,top=s.t+68,cw=Math.min(150,(s.w-20-gap*(cols-1))/cols),rows=Math.ceil(LV.length/cols),ch=Math.min(port?118:132,(s.b-top-20-gap*(rows-1))/rows);const x0=s.l+(s.w-(cw*cols+gap*(cols-1)))/2;
  LV.forEach((L,i)=>{const x=x0+(i%cols)*(cw+gap),y=top+Math.floor(i/cols)*(ch+gap),un=unlocked(i);BTNDEF.push({id:'lv'+i,x,y,w:cw,h:ch,cb:()=>openLevel(i)});menuBtns.push({x,y,w:cw,h:ch});
   X.fillStyle=un?'rgba(30,32,40,.92)':'rgba(30,30,30,.8)';rr(x,y,cw,ch,14);X.fill();X.lineWidth=3;X.strokeStyle=un?'#ff5a5a':'#666';X.stroke();
   txt(String(i+1),x+cw/2,y+ch*.24,Math.min(30,ch*.26),un?'#fff':'#888');const nl=wrapTxt(L.n,cw-12,16).slice(0,2);nl.forEach((l,k)=>txt(l,x+cw/2,y+ch*.5+k*18-(nl.length-1)*9,16,un?'#ffd7d7':'#999','center','bold',cw-10,false));
-  const sv=save.stars[i]||0;if(un)txt('★★★'.slice(0,sv)+'☆☆☆'.slice(0,3-sv),x+cw/2,y+ch*.83,Math.min(22,ch*.2),'#ffe14a','center','bold',0,false);else txt(SAMPLE&&i>=SAMPLE_LEVELS?'🔒 Full game':'🔒',x+cw/2,y+ch*.83,15,'#bbb','center','bold',cw-8,false)});
+  const sv=save.stars[i]||0;if(un)txt('★★★'.slice(0,sv)+'☆☆☆'.slice(0,3-sv),x+cw/2,y+ch*.83,Math.min(22,ch*.2),'#ffe14a','center','bold',0,false);else{X.font='bold 16px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';txt(SAMPLE&&i>=SAMPLE_LEVELS?(X.measureText('🔒 Full game').width<=cw-8?'🔒 Full game':'🔒 Full'):'🔒',x+cw/2,y+ch*.83,16,'#bbb','center','bold',cw-8,false)}});
  if(menuToast){txt(menuToast.s,s.l+s.w/2,s.b-30,17,'#fff','center','bold',s.w-20)}}
 function drawIntro(t){const s=S();bgCity(t);const L=G.L,port=H>W,pw=Math.min(port?s.w-20:760,s.w-20),px=s.l+(s.w-pw)/2;
  const lines=L.st.map((st,i)=>{let a;if(st.get.length&&st.drop.length)a='drop '+st.drop.map(d=>IT[d][1]).join('')+', get '+st.get.map(g=>IT[g][1]).join('');else if(st.drop.length)a='deliver '+st.drop.map(d=>IT[d][1]).join('');else if(st.get.length)a='get '+st.get.map(g=>IT[g][1]).join('');else a='visit';return (i+1)+'. '+st.p.ic+' '+st.p.name+': '+a});
  const cols=port?1:2,per=Math.ceil(lines.length/cols),lh=port?24:22;const story=wrapTxt(L.s,pw-30,17);
- const ph=Math.min(s.h-16,60+story.length*22+per*lh+34+70+16),py=s.t+(s.h-ph)/2;panel(px,py,pw,ph);
+ const camS='👁️ '+G.cams.length+' cameras'+(L.sw?' ('+L.sw+' sweeping)':'')+(L.pat?' · 🚓 '+L.pat+' patrol'+(L.pat>1?'s':''):'')+' · par '+fmt(G.par),il=wrapTxt(camS,pw-28,16);
+ const ph=Math.min(s.h-16,60+story.length*22+per*lh+34+(il.length-1)*20+70+16),py=s.t+(s.h-ph)/2;panel(px,py,pw,ph);
  txt('LEVEL '+(G.li+1)+': '+L.n,px+pw/2,py+28,24,'#ffe14a','center','bold',pw-20);let y=py+58;story.forEach(l=>{txt(l,px+pw/2,y,17,'#fff','center','600',0,false);y+=22});y+=4;
  lines.forEach((l,i)=>{const c=Math.floor(i/per),r=i%per;txt(l,px+16+c*(pw/2),y+r*lh+8,16,'#d7ffe0','left','600',(pw/cols)-24,false)});y+=per*lh+12;
- txt('👁️ '+G.cams.length+' cameras'+(L.sw?' ('+L.sw+' sweeping)':'')+(L.pat?' · 🚓 '+L.pat+' patrol'+(L.pat>1?'s':''):'')+' · par '+fmt(G.par),px+pw/2,y+6,16,'#ffb0b0','center','bold',pw-20,false);y+=24;
+ il.forEach((l,k)=>txt(l,px+pw/2,y+6+k*20,16,'#ffb0b0','center','bold',pw-20,false));y+=24+(il.length-1)*20;
  const bw=Math.min(180,(pw-40)/2);button('back',px+pw/2-bw-8,py+ph-62,bw,50,'◀ Levels','#3a62c9',()=>go('levels'));button('go',px+pw/2+8,py+ph-62,bw,50,'▶ GO!','#2fae4a',()=>startPlay(),{sz:24})}
 function drawPause(t){drawPlay(t);const s=S();X.fillStyle='rgba(0,0,0,.6)';X.fillRect(0,0,W,H);BTNDEF=[];menuBtns=[];const pw=Math.min(340,s.w-30),bh=port2()?54:46,gap=10,ph=50+5*(bh+gap)+10,px=s.l+(s.w-pw)/2,py=s.t+(s.h-ph)/2;panel(px,py,pw,ph);
  txt('PAUSED',px+pw/2,py+28,26,'#ffe14a');let y=py+54;const B=(id,l,c,cb)=>{button(id,px+20,y,pw-40,bh,l,c,cb);y+=bh+gap};
  B('resume','▶ Resume','#2fae4a',()=>go('play'));B('restart','↻ Restart level','#c98a2b',()=>{buildLevel(LVI);startPlay()});B('ctl','🎮 Controls: '+(save.ctl==='stick'?'Touch Stick':'Buttons'),'#6a4bc9',()=>{save.ctl=save.ctl==='stick'?'btns':'stick';persist()});
  B('mute2',save.muted?'🔇 Sound: OFF':'🔊 Sound: ON','#3a3f4f',()=>setMute(!save.muted));B('quit','☰ Level select','#3a62c9',()=>go('levels'))}
 const port2=()=>H>W;
-function drawResult(t){if(G)drawPlay(t);const s=S();X.fillStyle='rgba(0,0,0,.6)';X.fillRect(0,0,W,H);BTNDEF=[];menuBtns=[];const r=RES,port=H>W;
- const pw=Math.min(420,s.w-20),adH=IS589?(port?82:66):0,ph=Math.min(s.h-16-adH,port?330:268),px=s.l+(s.w-pw)/2,py=s.t+Math.max(8,(s.h-ph-adH)/2);panel(px,py,pw,ph);
+function lbOpen(){const o=document.getElementById('palbOv');return !!(o&&o.classList.contains('on'))}
+function drawResult(t){if(G)drawPlay(t);const s=S();X.fillStyle='rgba(0,0,0,.6)';X.fillRect(0,0,W,H);BTNDEF=[];menuBtns=[];const r=RES,port=H>W,lb=lbOpen(),BS=document.body.style;
+ const pw=Math.min(420,s.w-20,lb&&!port?s.w*.5:1e9),adH=IS589?(port?82:66):0,ph=Math.min(s.h-16-adH,port?330:268),px=lb&&!port?s.l+10:s.l+(s.w-pw)/2,py=lb&&port?s.t+8:s.t+Math.max(8,(s.h-ph-adH)/2);panel(px,py,pw,ph);
+ BS.setProperty('--ftL',(lb&&!port?px+pw+10:10)+'px');BS.setProperty('--ftT',(lb&&port?py+ph+(IS589?adH+8:0)+8:10)+'px');
  if(r.win){txt('ERRANDS COMPLETE!',px+pw/2,py+30,25,'#7CFC9A','center','bold',pw-20);const n=Math.min(3,Math.floor(stateT/.35));if(n>r.shown&&r.shown<r.stars){r.shown++;SND.star()}
   for(let k=0;k<3;k++){const on=k<Math.min(n,r.stars);txt(on?'★':'☆',px+pw/2+(k-1)*54,py+(port?78:70),port?50:42,on?'#ffe14a':'#666','center','bold',0,true)}
   const rows=[['🏁 Finished',true],['⏱ '+fmt(r.t)+' (par '+fmt(r.par)+')',r.t<=r.par],['📸 Spotted '+r.spots+'×',r.spots===0]];let y=py+(port?122:104);
@@ -429,8 +443,8 @@ function drawResult(t){if(G)drawPlay(t);const s=S();X.fillStyle='rgba(0,0,0,.6)'
   txt('Errands done: '+G.si+' / '+G.L.st.length,px+pw/2,py+80+l.length*23+14,18,'#ffd7d7','center','bold',0,false)}
  const bw=(pw-40-20)/3,by=py+ph-62;button('rlv',px+20,by,bw,50,'☰ Levels','#3a62c9',()=>go('levels'),{sz:18});button('rretry',px+30+bw,by,bw,50,'↻ Retry','#c98a2b',()=>{openLevel(LVI);startPlay()},{sz:18});
  const nx=r.win&&LVI+1<LV.length&&unlocked(LVI+1),sx=r.win&&SAMPLE&&LVI+1>=SAMPLE_LEVELS&&LVI+1<LV.length;
- button('rnext',px+40+2*bw,by,bw,50,r.win?(sx?'Unlock ▶':'Next ▶'):'Try again','#2fae4a',()=>{if(!r.win){openLevel(LVI);startPlay()}else if(nx)openLevel(LVI+1);else if(sx)window.__smpWant=1;else go('levels')},{sz:18,dis:r.win&&!(nx||sx)&&LVI+1<LV.length});
- if(IS589){const aw=Math.min(380,s.w-20);adLayout(s.l+(s.w-aw)/2,py+ph+8,aw)}}
+ button('rnext',px+40+2*bw,by,bw,50,r.win?(sx?'Unlock ▶':'Next ▶'):'Try again','#2fae4a',()=>{if(!r.win){openLevel(LVI);startPlay()}else if(nx)openLevel(LVI+1);else if(sx){try{window.PALB&&PALB.isOpen()&&PALB.close()}catch(e){}window.__smpWant=1}else go('levels')},{sz:18,dis:r.win&&!(nx||sx)&&LVI+1<LV.length});
+ if(IS589){const aw=Math.min(380,s.w-20,pw);adLayout(lb&&!port?px+(pw-aw)/2:s.l+(s.w-aw)/2,py+ph+8,aw)}}
 
 // ===== BUSTED cutscene (v3): cops box you in, yank the driver out, super-silly slapstick cartoon beatdown (no blood) =====
 const BUST_LEN=6.0,BUST_SKIP=1;let BUST=null;
@@ -557,7 +571,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:'){const had=!!navig
 #dockHint{position:fixed;z-index:61;display:none;box-sizing:border-box;background:rgba(10,10,20,.92);color:#fff;border:2px solid #fff;border-radius:12px;font:13px/1.3 system-ui,-apple-system,sans-serif;padding:7px 36px 7px 10px;top:0;left:0}#dockHint.inl{position:relative;margin:4px auto;max-width:320px}
 #dockHintX{position:absolute;right:3px;top:50%;margin-top:-15px;width:30px;height:30px;border-radius:15px;border:0;background:#fff;color:#000;font:bold 15px sans-serif;padding:0;cursor:pointer}
 #shareToast{position:fixed;z-index:62;display:none;box-sizing:border-box;height:34px;border-radius:17px;border:2px solid #fff;background:#1f9d55;color:#fff;font:bold 13px/30px system-ui,sans-serif;text-align:center;white-space:nowrap;pointer-events:none;overflow:hidden}
-#inst,#ios,#ioshint{display:none!important}#dkProbe{position:fixed;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}.dk.smp{position:relative;opacity:.62;text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:#ff5050}.dk.smp:after{content:'';position:absolute;left:5px;right:5px;top:50%;height:3px;margin-top:-1px;background:#ff3b3b;border-radius:2px;transform:rotate(-16deg);pointer-events:none}#dockHint.smpc{padding:9px 38px 10px 11px;font-size:14px}#dockHint.smpc b{color:#ffd84a}#smpBuy{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:8px 0 0;height:34px;border-radius:17px;border:2px solid #fff;background:#e0439a;color:#fff;font:bold 14px/30px system-ui,-apple-system,sans-serif;padding:0 14px;cursor:pointer;touch-action:manipulation}#smpBuy.off{background:#444;opacity:.85;cursor:default}#smpBack{position:fixed;inset:0;z-index:59;display:none;background:rgba(0,0,0,.55)}.dk{height:44px!important;line-height:40px!important;font-size:17px!important;padding:0 16px!important;border-radius:22px!important}.dk.ic{width:44px!important}#dockHint{font-size:16px!important;padding:10px 54px 10px 12px!important}#dockHintX{width:44px!important;height:44px!important;margin-top:-22px!important;border-radius:22px!important;font-size:18px!important}#palbOv{align-items:flex-start!important;pointer-events:none!important;background:rgba(0,0,0,.25)!important}#palbCard{pointer-events:auto!important}#palbCard{font-size:17px!important;margin-top:8px}#palbCard li,#palbCard input,#palbCard button,#palbCard .note,#palbCard label,#palbCard td{font-size:16px!important}#palbX{width:44px!important;height:44px!important;border-radius:22px!important}#palbCard button{min-height:44px}#smpBuy{height:44px;line-height:40px;font-size:16px;border-radius:22px}#dockHint.smpc{font-size:16px}</style><div id="dock" role="toolbar" aria-label="Share and install"><button id="shareBtn" class="dk" type="button" aria-label="Share this game">🔗 Share</button><button id="instBtn" class="dk" type="button" aria-label="Install this game as an app">📲 Install</button></div><div id="dockHint" role="note">📲 On iPhone/iPad: tap Share <b>⬆</b> then “Add to Home Screen”.<button id="dockHintX" type="button" aria-label="Dismiss tip">✕</button></div><div id="shareToast" role="status" aria-live="polite">Link copied!</div><div id="dkProbe"></div><div id="smpBack"></div><script>(()=>{const SH={"title": "Flock This", "text": "Play Flock This, a free night-city driving game from five8nine Studios: run the errands and dodge the cameras!", "url": "https://ploug76.github.io/flock-this-589/"},ALLOW=[],INLINE=null,SHTXT="🔗 Share",SMP=window.__SAMPLE||null,PAYI=({"bhs": "https://ko-fi.com/bookofheavenstudios/commissions?commissionAlias=5df889530a", "589": "https://ko-fi.com/five8nine/commissions?commissionAlias=5c81b9373a"})[SMP]||'',PRICE="$1.99";const $=i=>document.getElementById(i);
+#inst,#ios,#ioshint{display:none!important}#dkProbe{position:fixed;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}.dk.smp{position:relative;opacity:.62;text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:#ff5050}.dk.smp:after{content:'';position:absolute;left:5px;right:5px;top:50%;height:3px;margin-top:-1px;background:#ff3b3b;border-radius:2px;transform:rotate(-16deg);pointer-events:none}#dockHint.smpc{padding:9px 38px 10px 11px;font-size:14px}#dockHint.smpc b{color:#ffd84a}#smpBuy{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:8px 0 0;height:34px;border-radius:17px;border:2px solid #fff;background:#e0439a;color:#fff;font:bold 14px/30px system-ui,-apple-system,sans-serif;padding:0 14px;cursor:pointer;touch-action:manipulation}#smpBuy.off{background:#444;opacity:.85;cursor:default}#smpBack{position:fixed;inset:0;z-index:59;display:none;background:rgba(0,0,0,.55)}.dk{height:44px!important;line-height:40px!important;font-size:17px!important;padding:0 16px!important;border-radius:22px!important}.dk.ic{width:44px!important}#dockHint{font-size:16px!important;padding:10px 54px 10px 12px!important}#dockHintX{width:44px!important;height:44px!important;margin-top:-22px!important;border-radius:22px!important;font-size:18px!important}#palbOv{align-items:flex-start!important;pointer-events:none!important;background:rgba(0,0,0,.25)!important}#palbCard{pointer-events:auto!important}#palbCard{font-size:17px!important;margin-top:8px}#palbCard li,#palbCard input,#palbCard button,#palbCard .note,#palbCard label,#palbCard td{font-size:16px!important}#palbX{width:44px!important;height:44px!important;border-radius:22px!important}#palbCard button{min-height:44px}#smpBuy{height:44px;line-height:40px;font-size:16px;border-radius:22px}#dockHint.smpc{font-size:16px}#smpLock p{font-size:16px!important}#smpLock .lnk{font-size:16px!important;min-height:44px;line-height:44px!important;margin-top:4px!important}#palbCard .sub,#palbCard div:not(.big),#palbCard .err,#palbCard .src{font-size:16px!important}#palbOv{padding-left:max(10px,var(--ftL,10px))!important;padding-top:max(10px,var(--ftT,10px))!important}</style><div id="dock" role="toolbar" aria-label="Share and install"><button id="shareBtn" class="dk" type="button" aria-label="Share this game">🔗 Share</button><button id="instBtn" class="dk" type="button" aria-label="Install this game as an app">📲 Install</button></div><div id="dockHint" role="note">📲 On iPhone/iPad: tap Share <b>⬆</b> then “Add to Home Screen”.<button id="dockHintX" type="button" aria-label="Dismiss tip">✕</button></div><div id="shareToast" role="status" aria-live="polite">Link copied!</div><div id="dkProbe"></div><div id="smpBack"></div><script>(()=>{const SH={"title": "Flock This", "text": "Play Flock This, a free night-city driving game from five8nine Studios: run the errands and dodge the cameras!", "url": "https://ploug76.github.io/flock-this-589/"},ALLOW=[],INLINE=null,SHTXT="🔗 Share",SMP=window.__SAMPLE||null,PAYI=({"bhs": "https://ko-fi.com/bookofheavenstudios/commissions?commissionAlias=5df889530a", "589": "https://ko-fi.com/five8nine/commissions?commissionAlias=5c81b9373a"})[SMP]||'',PRICE="$1.99";const $=i=>document.getElementById(i);
 if(SMP){SH.url=SH.url+'?sample='+encodeURIComponent(SMP);const h0=$('dockHint');h0.classList.add('smpc');h0.setAttribute('role','dialog');h0.innerHTML='<b>Sample version</b> — install the full game on your phone for '+PRICE+'<button id="smpBuy" type="button"'+(PAYI?'':' class="off" aria-disabled="true"')+'>'+(PAYI?'💳 Buy '+PRICE:'Checkout coming soon')+'</button><button id="dockHintX" type="button" aria-label="Close">✕</button>'}
 if(!SMP)SH.url=SH.url+'?sample='+"589";const bk=$('smpBack'),dock=$('dock'),sb=$('shareBtn'),ib=$('instBtn'),hint=$('dockHint'),hx=$('dockHintX'),toastEl=$('shareToast'),probe=$('dkProbe');
 if(INLINE){const a=document.querySelector(INLINE);if(a){a.after(dock);dock.after(hint)}dock.classList.add('inl');hint.classList.add('inl')}
@@ -611,7 +625,7 @@ window.__share=window.__dock={share,install,vis,tick,tapRects,SH,get last(){retu
 const el=$('smpLock'),buy=$('smpLockBuy'),lb=$('smpLockLb'),more=$('smpLockMore');
 $('smpLockTxt').textContent='You played '+C.label+' of the free sample. Unlock the full game for '+PRICE+': every level, no time limit, and it installs on your phone like an app.';
 if(PAY){buy.href=PAY;buy.textContent='💳 Unlock the full game · '+PRICE}else{buy.classList.add('off');buy.textContent='Checkout coming soon';buy.removeAttribute('href')}
-more.href=SMP==='589'?'https://ploug76.github.io/589-studios/#games':'https://ploug76.github.io/book-of-heaven-studios/#games';
+more.href=SMP==='589'?'https://589studios.github.io/589-studios/#games':'https://ploug76.github.io/book-of-heaven-studios/#games';
 const W=s=>{if(!s)return()=>false;const f=Function('try{return !!('+s+')}catch(e){return false}');return f};const when=W(C.when),onTitle=W("typeof state!=='undefined'&&state==='title'");
 let used=+localStorage.getItem(TK)||0,locked=false,last=performance.now(),saved=0;
 const inLb=t=>{const o=document.getElementById('palbOv');return !!(o&&t&&o.contains(t))};
