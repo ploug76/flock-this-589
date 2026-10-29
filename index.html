@@ -426,7 +426,7 @@ function drawHow(t){const s=S();bgCity(t);const port=H>W,pw=port?Math.min(560,s.
  txt('HOW TO PLAY',px+pw/2,py+30,26,'#ffe14a');const L=[['🚗','Drive around town and finish every errand stop, in order.'],['🟢','Follow the green arrow, the blue dotted GPS line and the minimap to the next stop.'],
  ['👁️','Flock cameras watch the roads. Stay OUT of the red cones!'],['📸','Driving through a cone reads your plate and adds HEAT. Too much heat and you are BUSTED.'],['🔄','Some cameras sweep back and forth. Time it, or take another street.'],
  ['🚓','Later, patrol cars cruise around. Stay out of their headlights.'],['⭐','Stars: 1 for finishing, 1 for beating par time, 1 for never getting spotted.'],
- ['🎮',(save.ctl==='stick'?'Touch & drag anywhere: the car drives the way you point.':'Buttons: ◀ ▶ steer, GAS and BRAKE (hold BRAKE to back up).')+' Keyboard: arrows or WASD, P pauses, M mutes.']];
+ ['🎮',(save.ctl==='stick'?'Touch & drag anywhere: the car drives the way you point.':'Buttons: ◀ ▶ steer, GAS and BRAKE (hold BRAKE to back up).')+' Keyboard: arrows or WASD, P pauses, M mutes.'],['🕹️','Controller: stick or D-pad to drive (▲ gas, ▼ brake / back up), A gas, B brake, Start pauses, Select mutes. Menus: D-pad to pick, A to select, B to go back.']];
  const cols=port||pw<520?1:2;const cw=(pw-30)/cols,fs=16,bh=52,top=py+56,bot=port?py+ph-bh-20:py+ph-10;
  const items=L.map(([ic,tx])=>({ic,lines:wrapTxt(tx,cw-44,fs)}));let yy=[0,0];for(const it of items){const c=cols===2?(yy[0]<=yy[1]?0:1):0;it.c=c;it.y=yy[c];yy[c]+=Math.max(30,it.lines.length*21+10)}
  const ch=Math.max(...yy);HOWMAX=Math.max(0,ch-(bot-top));HOWY=clamp(HOWY,0,HOWMAX);
@@ -883,4 +883,19 @@ window.PALB=api})();
 #palbTabs button{min-height:48px!important;font-size:16px!important}
 #palbList li{min-height:30px;height:auto!important;font-size:16px!important}
 </style>
+<!-- gamepad:start -->
+<script src="gamepad.js?v=1"></script>
+<script>
+GamepadSupport.init({
+ keys:{left:'ArrowLeft',right:'ArrowRight',up:'ArrowUp',down:'ArrowDown',a:'ArrowUp',rt:'ArrowUp',b:'Space',x:'Space',lt:'Space',start:'KeyP',back:'KeyM'},
+ menuKeys:{a:'Enter',start:'Enter'},
+ repeat:false,
+ ignoreSel:'#dock,#mute,#pause,#inst,#ios,.tb,#dockHint',
+ menu:function(){return !!document.querySelector('#palbOv.on,#smpLock.on')||state!=='play';},
+ items:function(){return (document.querySelector('#palbOv.on,#smpLock.on')||state==='play')?[]:BTNDEF;},
+ scroll:function(d){if(state==='how'&&HOWMAX>0)HOWY=clamp(HOWY+(d==='up'?-70:70),0,HOWMAX);},
+ back:function(){if(state==='bust'||state==='play'||state==='title'||document.querySelector('#palbOv.on,#smpLock.on'))return false;var b=BTNDEF.filter(function(x){return /back|menu|levels|close|home/i.test(x.id)})[0];if(b){b.cb();return true}if(state==='levels'&&UPS!==null){UPS=null;return true}if(state==='levels'||state==='how'){go('title');return true}return false;}
+});
+</script>
+<!-- gamepad:end -->
 </body></html>
